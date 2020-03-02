@@ -51,7 +51,7 @@ setup(
         'termcolor',
         'lark-parser',
         'networkx',
-        'git+https://github.com/mellesies/thomas-core',
+        'thomas-core @git+https://github.com/mellesies/thomas-core',
     ],
     package_data={
         "": [
