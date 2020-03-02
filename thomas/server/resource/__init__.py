@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Resources ... 
+Resources ...
 """
 import sys
 import os, os.path
@@ -9,8 +9,8 @@ import importlib
 
 from flask import g
 from flask_jwt_extended import (
-    jwt_required, 
-    get_jwt_identity, 
+    jwt_required,
+    get_jwt_identity,
     get_jwt_claims
 )
 
@@ -25,7 +25,7 @@ from ..util import sep, get_package_name
 __RESOURCES_INITIALIZED = False
 
 # ------------------------------------------------------------------------------
-# Helper functions/decoraters ... 
+# Helper functions/decoraters ...
 # ------------------------------------------------------------------------------
 def parse_datetime(dt=None, default=None):
     if dt:
@@ -58,7 +58,7 @@ def init(api, api_base, exclude=None):
 
     # Import the modules and call setup()
     for name in modules:
-        module = importlib.import_module(f'{pkg_name}.resource.{name}')
+        module = importlib.import_module(f'{pkg_name}.server.resource.{name}')
         module.setup(api, api_base)
 
     __RESOURCES_INITIALIZED = True

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
 import os, sys
 import datetime
 
@@ -39,7 +38,8 @@ WEB_BASE = '/app'
 # ------------------------------------------------------------------------------
 # Initialize Flask
 # ------------------------------------------------------------------------------
-app = Flask(APP_NAME)
+ROOT_PATH = os.path.dirname(__file__)
+app = Flask(APP_NAME, root_path=ROOT_PATH)
 
 # ------------------------------------------------------------------------------
 # Enable cross-origin resource sharing

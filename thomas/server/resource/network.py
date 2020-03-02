@@ -13,7 +13,7 @@ from http import HTTPStatus
 
 import json
 
-import pybn
+from thomas.core import BayesianNetwork
 
 from .. import server
 from .. import db
@@ -76,11 +76,11 @@ class Network(Resource):
             if result is None:
                 return None
 
-            bn = pybn.BayesianNetwork.from_dict(result.json)
+            bn = BayesianNetwork.from_dict(result.json)
 
             query = request.args
 
-            probs = bn.compute_posterior(None, query)
+            probs = bn.compute_marginals(None, query)
             probabilities = {key: value.zipped() for key, value in probs.items()}
 
             return bn.as_dict()
@@ -95,7 +95,7 @@ class Network(Resource):
     def post(self, id):
         # See if the data that was sent to us checks out
         data = request.json
-        bn = pybn.BayesianNetwork.from_dict(data)
+        bn = BayesianNetwork.from_dict(data)
 
         # Retrieve current entry from DB
         result = db.Network.get(id)
@@ -110,9 +110,9 @@ class NetworkQuery(Resource):
     def _query(self, id, query):
         # log.info(f'query: {query}, ({type(query)})')
         result = db.Network.get(id)
-        bn = pybn.BayesianNetwork.from_dict(result.json)
+        bn = BayesianNetwork.from_dict(result.json)
 
-        probs = bn.compute_posterior(None, query)
+        probs = bn.compute_marginals(None, query)
         probabilities = {key: value.zipped() for key, value in probs.items()}
 
 

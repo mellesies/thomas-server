@@ -1,28 +1,23 @@
-"""A setuptools based setup module.
-
-See:
-https://packaging.python.org/en/latest/distributing.html
-https://github.com/pypa/sampleproject
-"""
+# -*- coding: utf-8 -*-
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
+
 # To use a consistent encoding
 from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
-PKG_NAME = 'thomas'
-PKG_DESC = 'Thomas, the BN webinterface.'
+PKG_NAME = "thomas-server"
+PKG_DESC = "Thomas' RESTful API and webinterface."
 
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     PKG_DESCRIPTION = f.read()
 
-
 # Read the API version from disk. This file should be located in the package
 # folder, since it's also used to set the pkg.__version__ variable.
-with open(path.join(here, PKG_NAME, 'VERSION')) as fp:
+with open(path.join(here, 'thomas', 'server', 'VERSION')) as fp:
     PKG_VERSION = fp.read().strip()
 
 
@@ -32,11 +27,11 @@ setup(
     version=PKG_VERSION,
     description=PKG_DESC,
     long_description=PKG_DESCRIPTION,
-    url='',
+    url='https://github.com/mellesies/thomas-server',
     author='Melle Sieswerda',
-    author_email='',
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    python_requires='>=3',
+    author_email='m.sieswerda@iknl.nl',
+    packages=find_namespace_packages(include=['thomas.*']),
+    python_requires='>= 3.6',
     install_requires=[
         'appdirs',
         'bcrypt',
@@ -60,15 +55,11 @@ setup(
     package_data={
         PKG_NAME: [
             'VERSION',
-            'server/resource/swagger/*.yaml'
         ],
     },
     entry_points={
         'console_scripts': [
-            f'{PKG_NAME}={PKG_NAME}.cli:cli',
+            f'thomas=thomas.server.cli:cli',
         ],
     },
-    # dependency_links=[
-    #     'https://github.com/IKNL/flasgger/archive/0.9.3.tar.gz#egg=flasgger-0.9.3'
-    # ]
 )
