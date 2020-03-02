@@ -51,10 +51,17 @@ setup(
         'termcolor',
         'lark-parser',
         'networkx',
+        'git+https://github.com/mellesies/thomas-core',
     ],
     package_data={
-        PKG_NAME: [
-            'VERSION',
+        "": [
+            "config.yaml"
+        ],
+        "thomas.server": [
+            "VERSION",
+            "data/*.lark",
+            "data/*.json",
+            "data/*.oobn",
         ],
     },
     entry_points={
