@@ -3,10 +3,12 @@
 import os, sys
 import datetime
 
+import uuid
 import json
 
 from flask import Flask, render_template, abort, redirect, url_for, request, make_response
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, get_jwt_identity, get_jwt_claims, get_raw_jwt, jwt_required, jwt_optional, verify_jwt_in_request
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from flask_socketio import (
@@ -78,6 +80,43 @@ def output_json(data, code, headers=None):
     return resp
 
 
+# ------------------------------------------------------------------------------
+# Setup the Flask-JWT-Extended extension (JWT: JSON Web Token)
+# ------------------------------------------------------------------------------
+jwt = JWTManager(app)
+
+@jwt.user_claims_loader
+def user_claims_loader(identity):
+    roles = []
+    if isinstance(identity, db.User):
+        type_ = 'user'
+        roles = identity.roles
+    else:
+        log.error(f"could not create claims from {str(identity)}")
+
+    claims = {
+        'type': type_,
+        'roles': [role.name for role in roles],
+    }
+
+    return claims
+
+@jwt.user_identity_loader
+def user_identity_loader(identity):
+
+    if isinstance(identity, db.User):
+        return identity.id
+
+    log.error(f"Could not create a JSON serializable identity \
+                from '{str(identity)}'")
+
+@jwt.user_loader_callback_loader
+def user_loader_callback(identity):
+    if isinstance(identity, int):
+        return db.User.get(identity)
+    else:
+        return identity
+
 
 # ------------------------------------------------------------------------------
 # Setup flask-socketio
@@ -137,6 +176,8 @@ def run(app_ctx, ip=None, port=None, debug=True):
     config = app_ctx.config
     ip = ip or config['server']['ip'] or '127.0.0.1'
     port = port or config['server']['port'] or 5000
+
+    app.config['JWT_SECRET_KEY'] = config.get('jwt_secret_key', str(uuid.uuid1()))
 
     # Run the (web)server without SSL
     log.warn(f'Starting server at http://{ip}:{port}')

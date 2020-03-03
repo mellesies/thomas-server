@@ -28,7 +28,8 @@ class AppContext(object, metaclass=Singleton):
     This includes file locations and database connections.
     """
 
-    def __init__(self, app_name, environment, config_file='config.yaml', system_context=False):
+    def __init__(self, app_name, environment, config_file='config.yaml',
+                 system_context=False):
         """Create a new AppContext instance.
 
         Args;
@@ -56,7 +57,6 @@ class AppContext(object, metaclass=Singleton):
         env = self.environment
 
         return f"AppContext('{app}', {env})"
-
 
     def find_config(self):
         app_name = self.app_name

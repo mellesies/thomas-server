@@ -54,9 +54,9 @@ class NetworkSchema(ModelSchema):
     class Meta:
         model = db.Network
 
-        # exclude = [
-        #     'json',
-        # ]
+        exclude = [
+            'json',
+        ]
 
 
 schema = NetworkSchema()
@@ -71,23 +71,7 @@ class Network(Resource):
         """Return a (list of) Bayesian Network(s)."""
 
         if id:
-            result = db.Network.get(id)
-
-            if result is None:
-                return None
-
-            bn = BayesianNetwork.from_dict(result.json)
-
-            query = request.args
-
-            probs = bn.compute_marginals(None, query)
-            probabilities = {key: value.zipped() for key, value in probs.items()}
-
-            return bn.as_dict()
-            # return {
-            #     'network': ,
-            #     'probabilities': probabilities
-            # }
+            return db.Network.get(id)
 
         result = db.Network.get()
         return schema.dump(result, many=(not id))

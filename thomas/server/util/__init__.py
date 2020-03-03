@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function
 
 import sys
 import os, os.path
+import inspect
 
 import logging
 import logging.handlers
@@ -18,6 +19,26 @@ using_console_for_logging = False
 def sep(chr='-', rep=80):
     """Print a separator to the console."""
     print(chr * 80)
+
+def log_full_request(request, log=None):
+    if log is None:
+        stack = inspect.stack()
+        calling = stack[1]
+        filename = os.path.split(calling.filename)[-1]
+        module_name = os.path.splitext(filename)[0]
+
+        log = logging.getLogger(module_name)
+
+    log.info(f'{request.method}: {request.url}')
+    log.info(f'  request.args: {request.args}')
+    log.info(f'  request.data: {request.get_data()}')
+
+    if request.is_json and len(request.data):
+        log.info(f'  request.json: {request.json}')
+
+    log.info(f'  headers:')
+    for header in str(request.headers).splitlines():
+        log.info(f'    ' + header)
 
 def get_package_name():
     return __name__.split('.')[0]

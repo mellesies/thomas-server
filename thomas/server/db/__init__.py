@@ -113,6 +113,7 @@ def jsonable(value):
 
 
 def init(ctx, URI='sqlite:////tmp/test.db', drop_all=False):
+    """Initialize the database."""
     global engine, object_session, Session
 
     # Make sure that the directory for the SQLite
@@ -168,5 +169,5 @@ def init(ctx, URI='sqlite:////tmp/test.db', drop_all=False):
 # Import model here
 # ------------------------------------------------------------------------------
 from .network import *
-
+from .security import *
 
