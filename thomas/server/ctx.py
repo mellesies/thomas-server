@@ -9,7 +9,6 @@ import yaml
 
 from . import db
 from . import util
-from .util import sep
 
 log = util.get_log(__name__)
 

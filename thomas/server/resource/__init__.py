@@ -20,7 +20,7 @@ import logging
 module_name = __name__.split('.')[-1]
 log = logging.getLogger(module_name)
 
-from ..util import sep, get_package_name
+from ..util import get_package_name
 
 __RESOURCES_INITIALIZED = False
 
