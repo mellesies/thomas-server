@@ -62,6 +62,12 @@ def create_users():
 def create_networks():
     log.info("Creating networks")
 
+    try_to_create(db.Network, 'lungcancer',
+        abbr='lungcancer',
+        name='Lungcancer',
+        json=examples.get_student_network().as_dict(),
+    )
+
     try_to_create(db.Network, 'student',
         abbr='student',
         name='Student',
