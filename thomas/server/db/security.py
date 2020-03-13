@@ -34,10 +34,17 @@ association_table_user_role = Table(
 class Role(Base):
     __tablename__ = 'role'
 
-    name =  Column(String)
+    name =  Column(String, unique=True)
 
     def __repr__(self):
         return f"<Role name='{self.name}'>"
+
+    @classmethod
+    def getRoleByName(cls, name):
+        """Find a Role by its name."""
+        session = db.Session()
+        return session.query(cls).filter_by(name=name).one()
+
 
 # ------------------------------------------------------------------------------
 # User
@@ -46,7 +53,7 @@ class User(Base):
     __tablename__ = 'user'
 
     # id = Column(Integer, primary_key=True)
-    username = Column(String)
+    username = Column(String, unique=True)
     password_hash = Column(String)
 
     firstname = Column(String(50), default='')
@@ -62,6 +69,15 @@ class User(Base):
     def __repr__(self):
         """repr(x) <==> x.__repr__()"""
         return f"<db.security.User(id={self.id}, username='{self.username}')>"
+
+    @property
+    def password(self):
+        return self.password_hash
+
+    @password.setter
+    def password(self, value):
+        self.set_password(value)
+
 
     # Copied from https://docs.pylonsproject.org/projects/pyramid/en/master/tutorials/wiki2/definingmodels.html
     def set_password(self, pw):

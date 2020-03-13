@@ -5,6 +5,7 @@ from setuptools import setup, find_namespace_packages
 
 # To use a consistent encoding
 from codecs import open
+import os
 from os import path
 
 here = path.abspath(path.dirname(__file__))
@@ -20,6 +21,28 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 with open(path.join(here, 'thomas', 'server', 'VERSION')) as fp:
     PKG_VERSION = fp.read().strip()
 
+def package_files(directory, base=''):
+    paths = []
+    for (path, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            p = os.path.join(path, filename)
+            paths.append(p.replace(base, ''))
+    return paths
+
+
+thomas_server_files = [
+    "VERSION",
+    "data/*.lark",
+    "data/*.json",
+    "data/*.oobn",
+]
+
+thomas_server_files.extend(
+    package_files(
+        'thomas/server/static/',
+        base='thomas/server/'
+    )
+)
 
 # Setup the package
 setup(
@@ -55,12 +78,7 @@ setup(
         "": [
             "config.yaml"
         ],
-        "thomas.server": [
-            "VERSION",
-            "data/*.lark",
-            "data/*.json",
-            "data/*.oobn",
-        ],
+        "thomas.server": thomas_server_files,
     },
     entry_points={
         'console_scripts': [

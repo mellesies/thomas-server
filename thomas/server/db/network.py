@@ -23,6 +23,7 @@ class Network(Base):
     _keys = ['name', 'json']
 
     id = Column(Integer, primary_key=True)
+    abbr = Column(String(16), unique=True)
     name = Column(String(64))
     json = Column(JSON)
 

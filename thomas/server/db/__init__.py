@@ -15,6 +15,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm.exc import NoResultFound
 
+import json
+import yaml
+
 import enum
 
 module_name = __name__.split('.')[-1]
@@ -61,6 +64,9 @@ class Base(object):
 
     def save(self):
         if self.id is None:
+            # FIXME: this is dangerous: when session.add() fails (due to table
+            #        constraints, for example) it is not possible to call
+            #        session.rollback()
             session = Session()
             session.add(self)
         else:
@@ -111,6 +117,26 @@ def jsonable(value):
     #        (or other JSON-serializable types) just be returned as-is?
     raise Exception('value should be instance of db.Base or list!')
 
+# Alias
+as_dict = jsonable
+
+def as_yaml(value):
+    """Dump a database instance to yaml."""
+
+    value = as_dict(value)
+
+    # columns with json data are treated a little differnently
+    try:
+        json_data = json.dumps(value['json'])
+
+    except AttributeError:
+        pass
+
+    else:
+        value['json'] = json_data
+
+
+    return yaml.dump(value)
 
 def init(ctx, URI='sqlite:////tmp/test.db', drop_all=False):
     """Initialize the database."""
@@ -162,6 +188,21 @@ def init(ctx, URI='sqlite:////tmp/test.db', drop_all=False):
     Base.metadata.create_all(bind=engine)
     log.info("Database initialized!")
 
+def load_fixtures(fixtures):
+    """Load fixtures from a dictionary."""
+    log.warn("Loading fixtures")
+
+    session = Session()
+
+    for clsname, values in fixtures.items():
+        log.debug(f"  - Processing class {clsname}")
+        cls = eval(clsname)
+
+        for entry in values:
+            instance = cls(**entry)
+            session.add(instance)
+
+    session.commit()
 
 
 

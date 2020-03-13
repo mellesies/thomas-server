@@ -80,7 +80,7 @@ class AppContext(object, metaclass=Singleton):
             if os.path.exists(fullpath):
                 return fullpath
 
-        msg = 'Could not find configuration file "{filename}"!?'
+        msg = f'Could not find configuration file "{filename}"!?'
         log.error(msg)
         log.info('Tried the following directories:')
         for d in dirs:

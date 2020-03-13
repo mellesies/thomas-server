@@ -34,7 +34,8 @@ APP_NAME = util.get_package_name()
 PKG_NAME = util.get_package_name()
 
 RESOURCES_INITIALIZED = False
-WEB_BASE = '/app'
+# WEB_BASE = '/app'
+WEB_BASE = ''
 
 
 # ------------------------------------------------------------------------------
@@ -128,9 +129,11 @@ socketio = SocketIO(app)
 # Http routes
 # ------------------------------------------------------------------------------
 @app.route(WEB_BASE+'/', defaults={'path': ''})
-@app.route(WEB_BASE+'/<path:path>')
+@app.route(WEB_BASE+'/index.html', defaults={'path': ''})
+# @app.route(WEB_BASE+'/<path:path>')
 def index(path):
-    return "<html><body><h1>Hi there!!</h2></body></html>"
+    # return "<html><body><h1>Hi there!!</h2></body></html>"
+    return redirect('/static/index.html', 301)
 
 
 
@@ -176,6 +179,9 @@ def run(app_ctx, ip=None, port=None, debug=True):
     config = app_ctx.config
     ip = ip or config['server']['ip'] or '127.0.0.1'
     port = port or config['server']['port'] or 5000
+
+    if app_ctx.environment == 'prod':
+        debug = False
 
     app.config['JWT_SECRET_KEY'] = config.get('jwt_secret_key', str(uuid.uuid1()))
 

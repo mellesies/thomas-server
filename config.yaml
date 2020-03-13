@@ -1,6 +1,6 @@
 environment:
   dev:
-    description: Dev
+    description: DEV
     type: dev
 
     logging:
@@ -15,9 +15,29 @@ environment:
       ip: '127.0.0.1' # ip address to listen on
       port: 5000      # port to listen on
       api_path: '/'
-      exclude:        # resources to exclude/skip
-        # - version
+      exclude: []     # resources to exclude/skip
 
     database:
       uri: sqlite:///dev.db
+
+  prod:
+    description: PROD
+    type: prod
+
+    logging:
+      level:        DEBUG                  # Can be on of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+      file:         'server.log'           # Filename of logfile
+      use_console:  True                   # Log output to the console?
+      backup_count: 5                      # Number of logs to keep
+      max_size:     1024                   # Specified in kB (i.e. 1024 means a maximum file size of 1MB)
+      format:       "%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s"
+
+    server:
+      ip: '0.0.0.0' # ip address to listen on
+      port: 5000      # port to listen on
+      api_path: '/'
+      exclude: []     # resources to exclude/skip
+
+    database:
+      uri: sqlite:///prod.db
 
