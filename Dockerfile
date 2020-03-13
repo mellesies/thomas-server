@@ -12,9 +12,7 @@ COPY config.yaml /config.yaml
 
 WORKDIR /usr/local/python/
 
-# This probably isn't necessary as github/.../thomas-core is listed as a
-# dependency in setup.py.
-# RUN git clone https://github.com/mellesies/thomas-core
+# thomas-core is already installed in the base image.
 RUN pip install ./thomas-server
 
 # Load fixtures here (users & networks) & run thomas!

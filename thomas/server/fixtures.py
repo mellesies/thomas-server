@@ -65,7 +65,7 @@ def create_networks():
     try_to_create(db.Network, 'lungcancer',
         abbr='lungcancer',
         name='Lungcancer',
-        json=examples.get_student_network().as_dict(),
+        json=examples.get_lungcancer_network().as_dict(),
     )
 
     try_to_create(db.Network, 'student',
