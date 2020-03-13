@@ -18,8 +18,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 # Read the API version from disk. This file should be located in the package
 # folder, since it's also used to set the pkg.__version__ variable.
-with open(path.join(here, 'thomas', 'server', 'VERSION')) as fp:
-    PKG_VERSION = fp.read().strip()
+version_path = os.path.join(here, 'thomas', 'server', '_version.py')
+version_ns = {
+    '__file__': version_path
+}
+with open(version_path) as f:
+    exec(f.read(), {}, version_ns)
 
 def package_files(directory, base=''):
     paths = []
@@ -31,10 +35,7 @@ def package_files(directory, base=''):
 
 
 thomas_server_files = [
-    "VERSION",
-    "data/*.lark",
-    "data/*.json",
-    "data/*.oobn",
+    "__build__",
 ]
 
 thomas_server_files.extend(
@@ -47,9 +48,10 @@ thomas_server_files.extend(
 # Setup the package
 setup(
     name=PKG_NAME,
-    version=PKG_VERSION,
+    version=version_ns['__version__'],
     description=PKG_DESC,
     long_description=PKG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     url='https://github.com/mellesies/thomas-server',
     author='Melle Sieswerda',
     author_email='m.sieswerda@iknl.nl',
@@ -72,7 +74,7 @@ setup(
         'requests',
         'sqlalchemy>=1.3',
         'termcolor',
-        'thomas-core @git+https://github.com/mellesies/thomas-core',
+        'thomas-core',
     ],
     package_data={
         "": [

@@ -3,16 +3,34 @@
 Thomas' RESTful API and webinterface.
 
 ## Installation
-```bash
-git clone https://github.com/mellesies/thomas-server
-cd thomas-server
 
-# This will install thomas-core from git
-pip install -e .
+### Normal
+To install from PyPI use `pip`:
+
+```bash
+    pip install thomas-server
+```
+
+### Development
+To do a development install:
+
+```bash
+    git clone https://github.com/mellesies/thomas-server
+    cd thomas-server
+    pip install -e .
+```
+
+### Docker
+A Docker image is available for easy desployment. The following command will
+start a server, listening on `localhost`, port `5000`:
+
+```bash
+    docker run --rm -it -p 5000:5000 mellesies/thomas-server
 ```
 
 ## Usage
 Start the server as follows:
+
 ```bash
 thomas start
 ```
