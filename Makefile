@@ -1,6 +1,8 @@
 # `make` is expected to be called from the directory that contains
 # this Makefile
 
+TAG := latest
+
 rebuild: clean build-dist
 
 build-dist:
@@ -17,6 +19,26 @@ publish-test:
 publish:
 	# Uploading to pypi.org
 	twine upload --repository pypi dist/*
+
+docker-image:
+	# Building docker image
+	# --------------------------------------------------------------------------
+	# Rebuild the UI
+	# --------------------------------------------------------------------------
+	cd ../thomas-ui-dev; npm run build && npm run deploy
+
+	docker build \
+	  -t thomas-server:${TAG} \
+	  -t mellesies/thomas-server:${TAG} \
+	  ./
+
+docker-run:
+	# Run the docker image
+	docker run --rm -it -p 5000:5000 thomas-server:${TAG}
+
+docker-push:
+	# Pushing the docker image
+	mellesies/thomas-server:${TAG}
 
 clean:
 	# Cleaning ...
