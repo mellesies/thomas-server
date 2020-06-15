@@ -4,34 +4,30 @@ import os, sys
 import logging
 from logging.handlers import RotatingFileHandler
 
+from sqlalchemy.engine.url import make_url, URL
+
 from appdirs import *
 import yaml
 
 from . import db
 from . import util
+from . import error
 
 log = util.get_log(__name__)
 
-class Singleton(type):
-    _instances = {}
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class AppContext(object, metaclass=Singleton):
+class AppContext(object, metaclass=util.Singleton):
     """AppContext holds the context for the current application.
 
     This includes file locations and database connections.
     """
-
     def __init__(self, app_name, environment, config_file='config.yaml',
                  system_context=False):
         """Create a new AppContext instance.
 
-        Args;
+        Args:
+            app_name (str): Application name. Used to determine the location of
+                of the configuration file.
             environment (str): Environment, as defined in the configuration
                 file, to use.
             config_file (str): Path to the configuration file.
@@ -48,7 +44,8 @@ class AppContext(object, metaclass=Singleton):
         self.config_file = config_file
         self.system_context = system_context
 
-        self.config = None
+        # Loads config and sets up logging
+        self.init()
 
     def __repr__(self):
         """repr(x) <==> x.__repr__()"""
@@ -56,6 +53,34 @@ class AppContext(object, metaclass=Singleton):
         env = self.environment
 
         return f"AppContext('{app}', {env})"
+
+    @property
+    def database_uri(self):
+        """Return the database URI from config file."""
+        URI = self.config['database']['uri']
+        url = make_url(URI)
+
+        if url.host is None and url.database:
+            # Make sure we resolve a relative path
+            directory, filename = os.path.split(url.database)
+            directory = self.abspath(directory, 'data')
+
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+
+            fullpath = os.path.join(directory, filename)
+
+            # Update the URI
+            URI = URL(
+                url.drivername,
+                username=url.username,
+                password=url.password,
+                host=url.host,
+                port=url.port,
+                database=fullpath,
+            )
+
+        return URI
 
     def find_config(self):
         app_name = self.app_name
@@ -75,26 +100,24 @@ class AppContext(object, metaclass=Singleton):
             ]
 
         for location in dirs:
+            # If filename is an absolute path `os.path.join()` ignores
+            # `location`.
             fullpath = os.path.join(location, filename)
 
             if os.path.exists(fullpath):
                 return fullpath
 
         msg = f'Could not find configuration file "{filename}"!?'
-        log.error(msg)
-        log.info('Tried the following directories:')
+        util.error(msg)
+        util.info('Tried the following directories:')
         for d in dirs:
-            log.info(f' * {d}')
+            util.info(f'  "{d}"')
 
-        raise Exception(msg)
+        raise error.ConfigNotFoundError(msg)
 
     def load_config(self):
         """Load YAML configuration from disk."""
         filename = self.find_config()
-
-        # sep()
-        # print(f'Using configuration at "{filename}"')
-        # sep()
 
         with open(filename) as fp:
             config = yaml.load(fp, Loader=yaml.FullLoader)
@@ -168,19 +191,17 @@ class AppContext(object, metaclass=Singleton):
         # Finally, capture all warnings using the logging mechanism.
         logging.captureWarnings(True)
 
-    def setup_database(self):
+    def setup_database(self, drop_database):
         """Initialize the database."""
         msg = "Configuration should be loaded first!"
         assert self.config is not None, msg
 
         config = self.config
         uri = config['database']['uri']
-        db.init(self, uri)
+        db.init(self, uri, drop_database)
 
     def init(self):
         """Set the CWD, load the config file and setup logging."""
-        # Read the command line parameters and change directory to the application
-        # root.
         app = self.app_name
         env = self.environment
 
@@ -194,6 +215,6 @@ class AppContext(object, metaclass=Singleton):
         log.info(f"Current working directory is '{os.getcwd()}'")
         log.info(f"Succesfully loaded configuration from '{self.config_file}'")
 
-        self.setup_database()
+        # self.setup_database(drop_database)
 
 

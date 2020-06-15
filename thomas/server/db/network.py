@@ -4,12 +4,8 @@
 """
 from datetime import date
 
-from sqlalchemy import *
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.util import classproperty
+from . import sqla
 
-
-from . import Base
 
 __all__ = ['Network']
 
@@ -17,15 +13,20 @@ __all__ = ['Network']
 # ------------------------------------------------------------------------------
 # Address
 # ------------------------------------------------------------------------------
-class Network(Base):
+class Network(sqla.Model):
     __tablename__ = 'network'
 
     _keys = ['name', 'json']
 
-    id = Column(Integer, primary_key=True)
-    abbr = Column(String(16), unique=True)
-    name = Column(String(64))
-    json = Column(JSON)
+    id = sqla.Column(sqla.String(64), primary_key=True)
+    name = sqla.Column(sqla.String(64))
+    json = sqla.Column(sqla.JSON)
 
+    user_id = sqla.Column(sqla.Integer, sqla.ForeignKey('user.id'))
+    owner = sqla.relationship('User', backref='networks')
 
-
+    def __repr__(self):
+        """repr(x) <==> x.__repr__()"""
+        name = self.name
+        owner = self.owner.username
+        return f"db.Network(id={self.id}, name='{name}')"

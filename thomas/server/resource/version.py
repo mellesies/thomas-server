@@ -2,6 +2,7 @@
 """
 Resources below '/<api_base>/token'
 """
+import sys
 import os
 import logging
 
@@ -11,6 +12,7 @@ from http import HTTPStatus
 
 from .. import util
 from .. import server
+from .._version import __version__
 
 module_name = __name__.split('.')[-1]
 log = logging.getLogger(module_name)
@@ -25,8 +27,14 @@ def setup(api, API_BASE):
         Version,
         path,
         endpoint='version',
-        methods=('GET',)
     )
+
+
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
 
 # ------------------------------------------------------------------------------
@@ -38,4 +46,4 @@ class Version(Resource):
     def get(self):
         """Get the current version."""
         # return util.get_package_name()
-        return 'Version 0.01 - alpha'
+        return __version__

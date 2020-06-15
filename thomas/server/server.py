@@ -10,12 +10,17 @@ from flask import Flask, render_template, abort, redirect, url_for, request, mak
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, get_jwt_identity, get_jwt_claims, get_raw_jwt, jwt_required, jwt_optional, verify_jwt_in_request
 from flask_restful import Api
+
+from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+
 from flask_socketio import (
     SocketIO,
     emit, send,
     join_room, leave_room
 )
+
+from sqlalchemy.engine.url import make_url
 
 import logging
 
@@ -23,6 +28,7 @@ from . import ctx
 from . import util
 from . import resource
 from . import db
+
 
 # Define a module global log instance
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -34,8 +40,7 @@ APP_NAME = util.get_package_name()
 PKG_NAME = util.get_package_name()
 
 RESOURCES_INITIALIZED = False
-# WEB_BASE = '/app'
-WEB_BASE = ''
+WEB_BASE = '/app'
 
 
 # ------------------------------------------------------------------------------
@@ -45,14 +50,16 @@ ROOT_PATH = os.path.dirname(__file__)
 app = Flask(APP_NAME, root_path=ROOT_PATH)
 
 # ------------------------------------------------------------------------------
+# Initialization of Marshmallow is deferred until init() is called and database
+# has been initialized.
+# ------------------------------------------------------------------------------
+ma = Marshmallow()
+
+# ------------------------------------------------------------------------------
 # Enable cross-origin resource sharing
 # ------------------------------------------------------------------------------
 CORS(app)
 
-# ------------------------------------------------------------------------------
-# Setup Marshmallow for marshalling/serializing
-# ------------------------------------------------------------------------------
-ma = Marshmallow(app)
 
 # ------------------------------------------------------------------------------
 # Api - REST JSON-rpc
@@ -87,36 +94,25 @@ def output_json(data, code, headers=None):
 jwt = JWTManager(app)
 
 @jwt.user_claims_loader
-def user_claims_loader(identity):
-    roles = []
-    if isinstance(identity, db.User):
-        type_ = 'user'
-        roles = identity.roles
-    else:
-        log.error(f"could not create claims from {str(identity)}")
-
+def user_claims_loader(user):
     claims = {
-        'type': type_,
-        'roles': [role.name for role in roles],
+        'roles': [role.name for role in user.roles],
     }
 
     return claims
 
 @jwt.user_identity_loader
-def user_identity_loader(identity):
+def user_identity_loader(user):
+    if isinstance(user, db.User):
+        return user.id
 
-    if isinstance(identity, db.User):
-        return identity.id
-
-    log.error(f"Could not create a JSON serializable identity \
-                from '{str(identity)}'")
+    msg = f"Could not create a JSON serializable identity from '{identity}'"
+    log.error(msg)
+    return None
 
 @jwt.user_loader_callback_loader
 def user_loader_callback(identity):
-    if isinstance(identity, int):
-        return db.User.get(identity)
-    else:
-        return identity
+    return db.User.get(identity)
 
 
 # ------------------------------------------------------------------------------
@@ -143,13 +139,14 @@ def index(path):
 app.config.update(
     DEBUG=True,
     JSON_AS_ASCII=False,
+    JSON_SORT_KEYS=False,
 )
 
 
-def init(config_file, environment, system):
+def init(config_file, environment, system, drop_database=False):
+    global app, ma, database
+
     # Load configuration and init logging
-    # config = util.init(APP_NAME, config_file, environment, run_as_user)
-    # db.init(config['database']['uri'])
     app_ctx = ctx.AppContext(
         APP_NAME,
         environment,
@@ -157,8 +154,23 @@ def init(config_file, environment, system):
         system,
     )
 
-    app_ctx.init()
-    init_resources(app_ctx)
+    # Setup Marshmallow for marshalling/serializing
+    # Order matters: Initialize SQLAlchemy before Marshmallow
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    URI = app_ctx.database_uri
+    app.config["SQLALCHEMY_DATABASE_URI"] = URI
+
+    url = make_url(URI)
+    log.info("Initializing the database")
+    log.debug("  driver:   {}".format(url.drivername))
+    log.debug("  host:     {}".format(url.host))
+    log.debug("  port:     {}".format(url.port))
+    log.debug("  database: {}".format(url.database))
+    log.debug("  username: {}".format(url.username))
+
+    db.sqla.init_app(app)
+    ma.init_app(app)
 
     return app_ctx
 
@@ -176,6 +188,8 @@ def init_resources(app_ctx):
 # ------------------------------------------------------------------------------
 def run(app_ctx, ip=None, port=None, debug=True):
     """Run the server."""
+    init_resources(app_ctx)
+
     config = app_ctx.config
     ip = ip or config['server']['ip'] or '127.0.0.1'
     port = port or config['server']['port'] or 5000
@@ -183,7 +197,10 @@ def run(app_ctx, ip=None, port=None, debug=True):
     if app_ctx.environment == 'prod':
         debug = False
 
-    app.config['JWT_SECRET_KEY'] = config.get('jwt_secret_key', str(uuid.uuid1()))
+    secret_key = config['server'].get('jwt_secret_key', str(uuid.uuid1()))
+
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=1)
+    app.config['JWT_SECRET_KEY'] = secret_key
 
     # Run the (web)server without SSL
     log.warn(f'Starting server at http://{ip}:{port}')
@@ -193,14 +210,5 @@ def run(app_ctx, ip=None, port=None, debug=True):
         log_output=False
     )
 
-
-
-# ------------------------------------------------------------------------------
-# __main__
-# ------------------------------------------------------------------------------
-if __name__ == '__main__':
-    config = init('config.yaml', 'dev')
-    init_resources(config)
-    run(config)
 
 

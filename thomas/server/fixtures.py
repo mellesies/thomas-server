@@ -35,8 +35,9 @@ def try_to_create(constructor, identifier, **kwargs):
 def create_roles():
     log.info("Creating roles")
 
-    try_to_create(db.Role, "root", name='root')
-    try_to_create(db.Role, "admin", name='admin')
+    try_to_create(db.Role, "root", id=1, name='root')
+    try_to_create(db.Role, "admin", id=2, name='admin')
+    try_to_create(db.Role, "user", id=3, name='user')
 
 
 def create_users():
@@ -53,6 +54,7 @@ def create_users():
     try_to_create(
         db.User,
         "root",
+        id=1,
         username="root",
         password="toor",
         roles=root_roles,
@@ -62,22 +64,27 @@ def create_users():
 def create_networks():
     log.info("Creating networks")
 
+    root = db.User.getByUsername('root')
+
     try_to_create(db.Network, 'lungcancer',
-        abbr='lungcancer',
+        id='lungcancer',
         name='Lungcancer',
         json=examples.get_lungcancer_network().as_dict(),
+        owner=root,
     )
 
     try_to_create(db.Network, 'student',
-        abbr='student',
+        id='student',
         name='Student',
         json=examples.get_student_network().as_dict(),
+        owner=root,
     )
 
     try_to_create(db.Network, 'sprinkler',
-        abbr='sprinkler',
+        id='sprinkler',
         name='Sprinkler',
         json=examples.get_sprinkler_network().as_dict(),
+        owner=root,
     )
 
 

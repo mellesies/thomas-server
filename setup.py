@@ -61,6 +61,7 @@ setup(
         'appdirs',
         'bcrypt',
         'click',
+        'colorama',
         'eventlet',
         'flask>=1.1',
         'flask-cors',

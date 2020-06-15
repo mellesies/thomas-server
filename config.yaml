@@ -15,7 +15,8 @@ environment:
       ip: '127.0.0.1' # ip address to listen on
       port: 5000      # port to listen on
       api_path: '/'
-      exclude: []     # resources to exclude/skip
+      jwt_secret_key: 'thisisnotsosecretbutfordevelopingitsfine'
+      exclude: ['_schema',]     # resources to exclude/skip
 
     database:
       uri: sqlite:///dev.db
@@ -36,7 +37,7 @@ environment:
       ip: '0.0.0.0' # ip address to listen on
       port: 5000      # port to listen on
       api_path: '/'
-      exclude: []     # resources to exclude/skip
+      exclude: ['_schema',]     # resources to exclude/skip
 
     database:
       uri: sqlite:///prod.db

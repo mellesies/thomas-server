@@ -8,13 +8,52 @@ import inspect
 import logging
 import logging.handlers
 
+import colorama
+from colorama import Fore, Style
+
 import yaml
 from appdirs import *
 
 from . import Colorer
 from .. import db
 
+colorama.init()
 using_console_for_logging = False
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+def echo(msg, level="info"):
+    type_ = {
+        "error": f"[{Fore.RED}error{Style.RESET_ALL}]",
+        "warn": f"[{Fore.YELLOW}warn{Style.RESET_ALL}]",
+        "info": f"[{Fore.GREEN}info{Style.RESET_ALL}]",
+        "debug": f"[{Fore.CYAN}debug{Style.RESET_ALL}]",
+    }.get(level)
+    print(f"{type_:16} - {msg}")
+
+
+def info(msg):
+    echo(msg, "info")
+
+
+def warning(msg):
+    echo(msg, "warn")
+
+
+def error(msg):
+    echo(msg, "error")
+
+
+def debug(msg):
+    echo(msg, "debug")
+
 
 def sep(chr='-', rep=80):
     """Print a separator to the console."""

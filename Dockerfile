@@ -13,7 +13,7 @@ COPY config.yaml /config.yaml
 WORKDIR /usr/local/python/
 
 # thomas-core is already installed in the base image.
-RUN pip install ./thomas-server
+RUN pip install -e ./thomas-server
 
 # Load fixtures here (users & networks) & run thomas!
 # WORKDIR /usr/local/python/thomas-server/
@@ -22,5 +22,6 @@ WORKDIR /
 RUN ln -s /usr/local/lib/python3.8/site-packages ./
 RUN ln -s /root/.local/share/thomas ./
 
+RUN thomas load-fixtures --environment=dev
 RUN thomas load-fixtures --environment=prod
 CMD thomas start --environment=prod

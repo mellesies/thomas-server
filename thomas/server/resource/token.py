@@ -2,15 +2,13 @@
 """
 Resources below '/<api_base>/token'
 """
-from __future__ import print_function, unicode_literals
 import os
 import logging
 
-from flask import request, jsonify
+from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
 from http import HTTPStatus
-from pathlib import Path
 
 from .. import server
 from .. import db
@@ -48,8 +46,6 @@ class Token(Resource):
 
     def post(self):
         """Authenticate user or node"""
-        util.log_full_request(request)
-
         if not request.is_json:
             log.warning('POST request without JSON body.')
             return {"msg": "Missing JSON in request"}, HTTPStatus.BAD_REQUEST
@@ -66,7 +62,7 @@ class Token(Resource):
         if db.User.username_exists(username):
             user = db.User.getByUsername(username)
             if not user.check_password(password):
-                msg = "password for username={} is invalid".format(username)
+                msg = f"password for '{username}' is invalid"
                 log.error(msg)
                 return {"msg": msg}, HTTPStatus.UNAUTHORIZED
         else:
@@ -81,6 +77,7 @@ class Token(Resource):
             'refresh_token': create_refresh_token(user),
             'refresh_url': server.api.url_for(RefreshToken),
             'fullname': user.getFullname(),
+            'roles': [r.name for r in user.roles],
         }
 
         return ret, HTTPStatus.OK
