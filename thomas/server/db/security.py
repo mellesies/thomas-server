@@ -36,7 +36,7 @@ class Role(sqla.Model):
     @classmethod
     def getRoleByName(cls, name):
         """Find a Role by its name."""
-        session = db.Session()
+        session = sqla.session
         return session.query(cls).filter_by(name=name).one()
 
 

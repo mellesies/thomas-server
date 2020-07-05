@@ -12,7 +12,7 @@ log = logging.getLogger(module_name)
 # Helper function
 # ------------------------------------------------------------------------------
 def try_to_create(constructor, identifier, **kwargs):
-    session = db.Session()
+    session = db.sqla.session
     clsname = constructor.__name__
 
     try:
@@ -22,7 +22,7 @@ def try_to_create(constructor, identifier, **kwargs):
 
     except Exception as e:
         log.warn(f'  Could not create {clsname} {identifier}')
-        # log.exception(e)
+        log.warn(e)
         session.rollback()
 
     else:

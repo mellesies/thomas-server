@@ -127,7 +127,7 @@ class BaseResource(Resource):
 
         return self._schema
 
-    def _search(self):
+    def _search(self, *args, **kwargs):
         """Search ..."""
         # FIXME: implement filtering/searching
         results = getattr(db, self.clsname()).get()
@@ -168,9 +168,21 @@ class BaseResource(Resource):
         # log_full_request(request, log)
 
         if id_or_operation:
-            return self._read(id_or_operation)
+            func = self._read
 
-        return self._search()
+            if id_or_operation.startswith('_'):
+
+                try:
+                    func = getattr(self, id_or_operation)
+
+                except Exception as e:
+                    log.warn("Could not find operation '{id_or_operation}'!?")
+                    log.warn(e)
+                    log.debug("Defaulting to '_read'")
+
+            return func(id_or_operation)
+
+        return self._search(id_or_operation)
 
     def post(self, id_or_operation=None):
         """Create a resource or execute an operation."""

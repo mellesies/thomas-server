@@ -58,7 +58,9 @@ ma = Marshmallow()
 # ------------------------------------------------------------------------------
 # Enable cross-origin resource sharing
 # ------------------------------------------------------------------------------
-CORS(app)
+# CORS(app)
+CORS(app, supports_credentials=True)
+
 
 
 # ------------------------------------------------------------------------------
@@ -140,8 +142,11 @@ app.config.update(
     DEBUG=True,
     JSON_AS_ASCII=False,
     JSON_SORT_KEYS=False,
+    SECRET_KEY=str(uuid.uuid1()).encode('utf8'),
+    # SECRET_KEY='developing'.encode('utf8'),
+    SESSION_COOKIE_DOMAIN='zakbroek.com',
+    SESSION_COOKIE_SAMESITE='None',
 )
-
 
 def init(config_file, environment, system, drop_database=False):
     global app, ma, database
@@ -193,14 +198,42 @@ def run(app_ctx, ip=None, port=None, debug=True):
     config = app_ctx.config
     ip = ip or config['server']['ip'] or '127.0.0.1'
     port = port or config['server']['port'] or 5000
+    # use_ssl = config['server'].get('use_ssl', False)
+    secret_key = config['server'].get('jwt_secret_key', str(uuid.uuid1()))
 
     if app_ctx.environment == 'prod':
         debug = False
 
-    secret_key = config['server'].get('jwt_secret_key', str(uuid.uuid1()))
-
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=1)
     app.config['JWT_SECRET_KEY'] = secret_key
+
+    # Only useful if not running behind a proxy (like nginx). Even then,
+    # self-signed certificates cause issues :-(
+    # if use_ssl:
+    #     cert_file = config['server'].get('cert_file', "cert.pem")
+    #     key_file = config['server'].get('key_file', "key.pem")
+    #
+    #     util.create_self_signed_cert(
+    #         cert_file,
+    #         key_file,
+    #         certargs={
+    #             "Country": "NL",
+    #              "State": "ZH",
+    #              "City": "Oegstgeest",
+    #              "Organization": "Sieswerda",
+    #              "Org. Unit": "",
+    #              "CN": 'sieswerda.net',
+    #         }
+    #     )
+    #
+    #     # Run the (web)server with SSL
+    #     log.info(f'Starting server at https://{ip}:{port}')
+    #     socketio.run(
+    #         app, ip, port,
+    #         debug=debug,
+    #         certfile=cert_file, keyfile=key_file,
+    #         log_output=False
+    #     )
 
     # Run the (web)server without SSL
     log.warn(f'Starting server at http://{ip}:{port}')

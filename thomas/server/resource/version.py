@@ -46,4 +46,5 @@ class Version(Resource):
     def get(self):
         """Get the current version."""
         # return util.get_package_name()
+        util.log_full_request(request)
         return __version__

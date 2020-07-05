@@ -40,25 +40,6 @@ def setup(api, API_BASE):
         resource_class_kwargs={'schema_class': schema_class},
     )
 
-    # api.add_resource(
-    #     Network,
-    #     path + '/<string:id_or_operation>',
-    #     endpoint='network_single',
-    #     resource_class_kwargs={'schema': schema},
-    # )
-
-# TODO: move logic to Network
-#    api.add_resource(
-#        NetworkQuery,
-#        path + '/<string:id>/_query',
-#        endpoint='network_query',
-#    )
-
-# ------------------------------------------------------------------------------
-# Model schema
-# ------------------------------------------------------------------------------
-# schema = NetworkSchema()
-
 # ------------------------------------------------------------------------------
 # Resources / API's
 # ------------------------------------------------------------------------------
@@ -119,7 +100,7 @@ class Network(BaseResource):
         log.info(f"403: not allowed!")
         abort(403)
 
-    def _search(self, **kwargs):
+    def _search(self, *args, **kwargs):
         """Overrides BaseResource._search()"""
         # util.log_full_request(request)
 
@@ -130,7 +111,7 @@ class Network(BaseResource):
         if args['_summary']:
             self.schema_args['exclude'] = ['json']
 
-        return super()._search(**kwargs)
+        return super()._search(*args, **kwargs)
 
     def _query(self):
         """Action: perform a network query."""
@@ -150,53 +131,3 @@ class Network(BaseResource):
             'query': query,
             'probabilities': probabilities
         }
-
-
-
-    # @only_for(['everyone'])
-    # def get(self, id_or_operation=None):
-    #     """Return a (list of) Bayesian Network(s)."""
-    #     log.info(f'user: {user}')
-    #     return super().get(id_or_operation)
-
-
-    # @only_for(['everyone'])
-    # def post(self, id_or_operation=None):
-    #     """Create a network."""
-    #
-    #     # Get the POSTed json
-    #     data = request.json
-    #
-    #     if id is None:
-    #         log.info("Creating new BN")
-    #         return self._create(data)
-    #
-    #     # Retrieve resource to create/update from the DB
-    #     return self._update(id, data)
-
-
-# class NetworkQuery(Resource):
-#     """Action: perform a network query."""
-#     def _query(self, id, query):
-#         # log.info(f'query: {query}, ({type(query)})')
-#         result = db.Network.get(id)
-#         bn = BayesianNetwork.from_dict(result.json)
-#
-#         probs = bn.compute_marginals(None, query)
-#         probabilities = {key: value.zipped() for key, value in probs.items()}
-#
-#
-#         return {
-#             'query': query,
-#             'probabilities': probabilities
-#         }
-#
-#     def get(self, id):
-#         query = request.args
-#         return self._query(id, query)
-#
-#     def post(self, id):
-#         query = request.json
-#         return self._query(id, query)
-#
-

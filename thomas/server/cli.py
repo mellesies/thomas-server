@@ -48,10 +48,6 @@ def cli_server_start(ip, port, config, system, environment, debug):
         util.error('Bailing out ...')
         sys.exit(1)
 
-    # except Exception as e:
-    #     util.error('Bailing out ...')
-    #     sys.exit(1)
-
     server.run(ctx, ip, port, debug)
 
 
@@ -106,7 +102,15 @@ def cli_fixtures(config, environment, system, drop_database):
     """Load fixtures."""
 
     # Initialize the database
-    ctx = server.init(config, environment, system, drop_database)
+    try:
+        ctx = server.init(config, environment, system, drop_database)
+
+    except error.ConfigNotFoundError:
+        # Not good. Exit!
+        sys.exit(1)
+
+    server.app.app_context().push()
+    db.sqla.create_all()
 
     # Run the fixtures ...
     fixtures.run()

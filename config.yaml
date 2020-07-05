@@ -14,6 +14,9 @@ environment:
     server:
       ip: '127.0.0.1' # ip address to listen on
       port: 5000      # port to listen on
+      use_ssl: False
+      cert_file: 'cert.pem'
+      key_file: 'key.pem'
       api_path: '/'
       jwt_secret_key: 'thisisnotsosecretbutfordevelopingitsfine'
       exclude: ['_schema',]     # resources to exclude/skip
@@ -36,6 +39,7 @@ environment:
     server:
       ip: '0.0.0.0' # ip address to listen on
       port: 5000      # port to listen on
+      use_ssl: False
       api_path: '/'
       exclude: ['_schema',]     # resources to exclude/skip
 
