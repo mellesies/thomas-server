@@ -45,20 +45,17 @@ def echo(msg, level="info"):
     print(f"{type_:16} - {msg}")
 
 
+def debug(msg):
+    echo(msg, "debug")
+
 def info(msg):
     echo(msg, "info")
-
 
 def warning(msg):
     echo(msg, "warn")
 
-
 def error(msg):
     echo(msg, "error")
-
-
-def debug(msg):
-    echo(msg, "debug")
 
 
 def sep(chr='-', rep=80):

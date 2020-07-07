@@ -14,6 +14,8 @@ import requests
 from urllib.parse import urlencode
 from uuid import uuid1
 
+import fhir
+
 from . import BaseResource, only_for, with_user
 from .. import server
 from .. import db
@@ -56,12 +58,47 @@ def gen_dict_with_key_value(key, value, var):
 class FHIR(Resource):
     """resource for FHIR Launch"""
 
+    def __get_observations(self):
+        """Return observations (key/value) for current patient."""
+        iss = session['iss']
+        patient = session['patient']
+
+        url = f'{iss}/Observation?patient={patient}'
+        response = requests.get(url)
+        log.debug(response.json())
+
+        codes = []
+        values = []
+
+        try:
+            bundle = fhir.model.Resource.fromNative(response.json())
+            # log.warn(bundle)
+
+            codes = [e.resource.code for e in bundle.entry]
+            values = [e.resource.value for e in bundle.entry]
+            log.warn(f'\n{[c.dumps() for c in codes]}')
+
+            # values = [e['resource']['valueCodeableConcept']['coding'][0]['code'] for e in bundle['entry']]
+            # codes = [e['resource']['code']['coding'][0]['code'] for e in bundle['entry']]
+
+        except Exception as e:
+            log.error('Could not retrieve data from Observation')
+            log.exception(e)
+
+        return list(zip(codes, values))
+
     def _launch(self):
         """SMART on FHIR Launch point!"""
         # 'iss' contains the URL to the FHIR server. 'launch' contains context
         # provided by EHR.
+        log.warn('-' * 80)
+        log.warn('_launch')
+        log.warn('-' * 80)
+        util.log_full_request(request)
+
         iss = request.args['iss']
         launch = request.args['launch']
+        model = request.args.get('model', 'network/lungcancer')
 
         # Retrieve the metadata to determine the authorization endpoint
         url = f'{iss}/metadata'
@@ -76,7 +113,7 @@ class FHIR(Resource):
         ))
 
         if value is None:
-            log.debug("Could not find OAuth URIs in meteadata?")
+            log.debug("Could not find OAuth URIs in metadata?")
             log.debug(metadata)
             abort(500)
 
@@ -86,13 +123,13 @@ class FHIR(Resource):
         for e in extensions:
             if e['url'] == 'authorize':
                 authorize_url = e['valueUri']
-                log.debug(f"Using authorize_url: '{authorize_url}'")
+                log.debug(f"Found authorize_url: '{authorize_url}'")
 
             elif e['url'] == 'token':
                 session['token'] = e['valueUri']
 
         if (authorize_url is None) or ('token' not in session):
-            log.debug("Could not find OAuth URIs in meteadata?")
+            log.debug("Could not find OAuth URIs in metadata?")
             log.debug(extensions)
             abort(500)
 
@@ -105,7 +142,7 @@ class FHIR(Resource):
         # 'redirect_uri'. This GET sends a JWT as a query parameter.
         params = {
             'response_type': 'code',
-            'redirect_uri': 'https://fhirstarter.zakbroek.com/fhir/_redirect',
+            'redirect_uri': 'https://fhirstarter.zakbroek.com/smartonfhir/_redirect',
             'launch': launch,
             'scope': 'launch',
             'state': str(uuid1()),
@@ -114,15 +151,23 @@ class FHIR(Resource):
 
         # 'state' is set in a session cookie so it can be checked in
         # `_redirect()`
+        session['iss'] = iss
         session['state'] = params['state']
+        session['model'] = model
         log.warn(session)
 
         qs = urlencode(params)
-        return redirect(f'{authorize_url}?{qs}')
+        redirect_url = f'{authorize_url}?{qs}'
+        log.debug(f"Redirecting to '{redirect_url}'")
+        log.debug('')
+
+        return redirect(redirect_url)
 
     def _redirect(self):
         """Method!"""
+        log.warn('-' * 80)
         log.warn('_redirect!')
+        log.warn('-' * 80)
         log.warn(session)
 
         if ('state' not in session) or (request.args['state'] != session['state']):
@@ -131,25 +176,29 @@ class FHIR(Resource):
         data = {
             'grant_type': 'authorization_code',
             'code': request.args['code'],
-            'redirect_uri': 'https://fhirstarter.zakbroek.com/fhir/_redirect',
+            'redirect_uri': 'https://fhirstarter.zakbroek.com/smartonfhir/_redirect',
         }
 
         response = requests.post(session['token'], data)
         authorization_result = response.json()
+
         log.warn(authorization_result)
 
         session.update(authorization_result)
-        return redirect(f'https://thomas-local.zakbroek.com')
-        # return f"Patient: {authorization_result['patient']}"
 
+        params = self.__get_observations()
+        qs = urlencode(params)
 
-    def _test(self):
-        session['session-cookie'] = 'this is a cookie value'
-        return "Ok"
+        redirect_url = f'https://thomas-local.zakbroek.com/{session["model"]}?{qs}'
+        log.debug(f"Redirecting to '{redirect_url}'")
+        log.debug('')
+
+        return redirect(redirect_url)
+
 
     def get(self, id_or_operation=None):
         """FHIR EHR launch endpoint"""
-        util.log_full_request(request)
+        # util.log_full_request(request)
 
         if id_or_operation and id_or_operation.startswith('_'):
             try:

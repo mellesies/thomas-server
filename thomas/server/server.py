@@ -145,7 +145,7 @@ app.config.update(
     SECRET_KEY=str(uuid.uuid1()).encode('utf8'),
     # SECRET_KEY='developing'.encode('utf8'),
     SESSION_COOKIE_DOMAIN='zakbroek.com',
-    SESSION_COOKIE_SAMESITE='None',
+    SESSION_COOKIE_SAMESITE=None,
 )
 
 def init(config_file, environment, system, drop_database=False):
