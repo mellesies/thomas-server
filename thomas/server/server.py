@@ -126,6 +126,10 @@ socketio = SocketIO(app)
 # ------------------------------------------------------------------------------
 # Http routes
 # ------------------------------------------------------------------------------
+@app.route('/', defaults={'path': ''})
+def root(path):
+    return redirect(WEB_BASE, 301)
+
 @app.route(WEB_BASE+'/', defaults={'path': ''})
 @app.route(WEB_BASE+'/<path:path>')
 # @app.route(WEB_BASE+'/index.html', defaults={'path': ''})
