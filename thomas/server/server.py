@@ -127,11 +127,12 @@ socketio = SocketIO(app)
 # Http routes
 # ------------------------------------------------------------------------------
 @app.route(WEB_BASE+'/', defaults={'path': ''})
-@app.route(WEB_BASE+'/index.html', defaults={'path': ''})
-# @app.route(WEB_BASE+'/<path:path>')
+@app.route(WEB_BASE+'/<path:path>')
+# @app.route(WEB_BASE+'/index.html', defaults={'path': ''})
 def index(path):
     # return "<html><body><h1>Hi there!!</h2></body></html>"
-    return redirect('/static/index.html', 301)
+    # return redirect('/static/index.html', 301)
+    return app.send_static_file('index.html')
 
 
 
