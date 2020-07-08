@@ -20,13 +20,15 @@ publish:
 	# Uploading to pypi.org
 	twine upload --repository pypi dist/*
 
-docker-image:
-	# Building docker image
+
+deploy-frontend:
 	# --------------------------------------------------------------------------
 	# Rebuild the UI
 	# --------------------------------------------------------------------------
 	cd ../thomas-ui-dev; npm run build && npm run deploy
 
+docker-image:
+	# Building docker image
 	docker build \
 	  -t thomas-server:${TAG} \
 	  -t mellesies/thomas-server:${TAG} \

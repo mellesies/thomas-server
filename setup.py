@@ -68,7 +68,7 @@ setup(
         'flask-socketio>=4.2',
         'flask>=1.1',
         'flask_jwt_extended',
-        'flask_marshmallow',
+        'flask_marshmallow>=0.12',
         'flask_sqlalchemy',
         'marshmallow',
         'marshmallow-sqlalchemy>=0.22',
@@ -76,7 +76,8 @@ setup(
         'requests',
         'sqlalchemy>=1.3',
         'termcolor',
-        'thomas-core'
+        'thomas-core',
+        'fhir @ https://github.com/mellesies/py-fhir/tarball/master#egg=fhir',
     ],
     package_data={
         "": [
