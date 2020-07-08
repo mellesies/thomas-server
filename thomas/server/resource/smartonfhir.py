@@ -58,6 +58,14 @@ def gen_dict_with_key_value(key, value, var):
 class FHIR(Resource):
     """resource for FHIR Launch"""
 
+    @staticmethod
+    def getvalue(v):
+        if isinstance(v, fhir.model.codeableconcept.CodeableConcept):
+            return v.coding[0].code.toNative()
+
+        return v.toNative()
+
+
     def __get_observations(self):
         """Return observations (key/value) for current patient."""
         iss = session['iss']
@@ -72,14 +80,15 @@ class FHIR(Resource):
 
         try:
             bundle = fhir.model.Resource.fromNative(response.json())
-            # log.warn(bundle)
+            log.warn(bundle)
 
-            codes = [e.resource.code for e in bundle.entry]
-            values = [e.resource.value for e in bundle.entry]
-            log.warn(f'\n{[c.dumps() for c in codes]}')
-
+            # codes = [e.resource.code for e in bundle.entry]
+            # values = [e.resource.value for e in bundle.entry]
             # values = [e['resource']['valueCodeableConcept']['coding'][0]['code'] for e in bundle['entry']]
             # codes = [e['resource']['code']['coding'][0]['code'] for e in bundle['entry']]
+
+            codes = [e.resource.code.coding[0].code.toNative() for e in bundle.entry]
+            values = [self.getvalue(e.resource.value) for e in bundle.entry]
 
         except Exception as e:
             log.error('Could not retrieve data from Observation')
