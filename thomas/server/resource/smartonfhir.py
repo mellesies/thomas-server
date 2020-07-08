@@ -142,7 +142,7 @@ class FHIR(Resource):
         # 'redirect_uri'. This GET sends a JWT as a query parameter.
         params = {
             'response_type': 'code',
-            'redirect_uri': '/smartonfhir/_redirect',
+            'redirect_uri': f'https://{request.host}/smartonfhir/_redirect',
             'launch': launch,
             'scope': 'launch',
             'state': str(uuid1()),
@@ -176,7 +176,7 @@ class FHIR(Resource):
         data = {
             'grant_type': 'authorization_code',
             'code': request.args['code'],
-            'redirect_uri': '/smartonfhir/_redirect',
+            'redirect_uri': f'https://{request.host}/smartonfhir/_redirect',
         }
 
         response = requests.post(session['token'], data)
@@ -189,7 +189,7 @@ class FHIR(Resource):
         params = self.__get_observations()
         qs = urlencode(params)
 
-        redirect_url = f'https://thomas-local.zakbroek.com/{session["model"]}?{qs}'
+        redirect_url = f'https://{request.host}/app/{session["model"]}?{qs}'
         log.debug(f"Redirecting to '{redirect_url}'")
         log.debug('')
 
