@@ -71,7 +71,7 @@ setup(
         'flask_marshmallow',
         'flask_sqlalchemy',
         'marshmallow',
-        'marshmallow-sqlalchemy',
+        'marshmallow-sqlalchemy>=0.22',
         'pyyaml',
         'requests',
         'sqlalchemy>=1.3',
