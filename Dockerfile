@@ -19,8 +19,9 @@ RUN pip install -e ./thomas-server
 # WORKDIR /usr/local/python/thomas-server/
 WORKDIR /
 
-RUN ln -s /usr/local/lib/python3.8/site-packages ./
-RUN ln -s /root/.local/share/thomas ./
+# Shortcuts for convenience
+# RUN ln -s /usr/local/lib/python3.8/site-packages ./
+# RUN ln -s /root/.local/share/thomas ./
 
 RUN thomas load-fixtures --environment=dev
 RUN thomas load-fixtures --environment=prod

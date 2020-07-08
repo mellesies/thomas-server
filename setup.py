@@ -63,19 +63,20 @@ setup(
         'click',
         'colorama',
         'eventlet',
-        'flask>=1.1',
         'flask-cors',
         'flask-restful',
         'flask-socketio>=4.2',
-        'flask_marshmallow',
+        'flask>=1.1',
         'flask_jwt_extended',
+        'flask_marshmallow',
+        'flask_sqlalchemy',
         'marshmallow',
         'marshmallow-sqlalchemy',
         'pyyaml',
         'requests',
         'sqlalchemy>=1.3',
         'termcolor',
-        'thomas-core',
+        'thomas-core'
     ],
     package_data={
         "": [
