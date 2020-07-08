@@ -3,8 +3,8 @@ FROM mellesies/thomas-core:latest
 
 LABEL maintainer="Melle Sieswerda <m.sieswerda@iknl.nl>"
 
-# thomas-server runs on port 5000
-EXPOSE 5000
+USER root
+
 
 # Copy package
 COPY . /usr/local/python/thomas-server/
@@ -24,4 +24,8 @@ RUN ln -s /root/.local/share/thomas ./
 
 RUN thomas load-fixtures --environment=dev
 RUN thomas load-fixtures --environment=prod
+
+# thomas-server runs on port 5000
+EXPOSE 5000
+
 CMD thomas start --environment=prod
