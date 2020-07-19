@@ -46,6 +46,7 @@ def setup(api, API_BASE):
 class Network(BaseResource):
     """Resource for network"""
 
+    @with_user
     def _create(self, data):
         """Create a new Network resource."""
 
@@ -53,7 +54,7 @@ class Network(BaseResource):
         id_ = data.get('id', str(uuid1()))
         name = data.get('name', '')
 
-        log.info(f'Creating network {id}')
+        log.info(f'Creating network {id_}')
 
         # Make sure this is a proper serialization.
         bn = BayesianNetwork.from_dict(data['json'])
@@ -65,6 +66,10 @@ class Network(BaseResource):
             json=bn.as_dict(),
             owner=user,
         )
+
+        print()
+        print(network)
+        print()
 
         # session = db.Session()
         session = db.sqla.session
@@ -79,6 +84,7 @@ class Network(BaseResource):
 
         return self.schema.dump(network, many=False)
 
+    @with_user
     def _update(self, id, data):
         """Update a Network resource."""
         log.info(f'Updating network "{id}"')

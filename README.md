@@ -21,7 +21,7 @@ To do a development install:
 ```
 
 ### Docker
-A Docker image is available for easy desployment. The following command will
+A Docker image is available for easy deployment. The following command will
 start a server, listening on `localhost`, port `5000`:
 
 ```bash

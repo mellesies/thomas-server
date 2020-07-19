@@ -77,7 +77,8 @@ setup(
         'sqlalchemy>=1.3',
         'termcolor',
         'thomas-core',
-        'fhir @ https://github.com/mellesies/py-fhir/tarball/master#egg=fhir',
+        # 'fhir @ https://github.com/mellesies/py-fhir/tarball/master#egg=fhir',
+        'py-fhir',
     ],
     package_data={
         "": [
