@@ -73,7 +73,6 @@ class Base(Model):
             # FIXME: this is dangerous: when session.add() fails (due to table
             #        constraints, for example) it is not possible to call
             #        session.rollback()
-            # session = Session()
             session = sqla.session
             session.add(self)
         else:
@@ -83,9 +82,9 @@ class Base(Model):
 
     def delete(self):
         if not self.id:
-            session = Session()
+            session = sqla.session
         else:
-            session = Session.object_session(self)
+            session = sqla.session.object_session(self)
 
         session.delete(self)
         session.commit()

@@ -156,7 +156,7 @@ class BaseResource(Resource):
 
     def _delete(self, id):
         """Delete a resource."""
-        pass
+        raise NotImplementedError()
 
 
     # --------------------------------------------------------------------------
@@ -217,5 +217,6 @@ class BaseResource(Resource):
 
     def delete(self, id_or_operation):
         """Delete a resource."""
-        self._delete(id_or_operation)
+        return self._delete(id_or_operation)
+
 

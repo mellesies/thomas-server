@@ -79,6 +79,7 @@ setup(
         'thomas-core',
         # 'fhir @ https://github.com/mellesies/py-fhir/tarball/master#egg=fhir',
         'py-fhir',
+        'werkzeug>=1.0',
     ],
     package_data={
         "": [

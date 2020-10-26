@@ -150,6 +150,7 @@ class FHIR(Resource):
         # Accessing the endpoint, triggers the server to do a GET request to
         # 'redirect_uri'. This GET sends a JWT as a query parameter.
         params = {
+            'client_id': 'thomas',
             'response_type': 'code',
             'redirect_uri': f'https://{request.host}/smartonfhir/_redirect',
             'launch': launch,
@@ -185,9 +186,11 @@ class FHIR(Resource):
         data = {
             'grant_type': 'authorization_code',
             'code': request.args['code'],
-            'redirect_uri': f'https://{request.host}/smartonfhir/_redirect',
+            # I think this parameter is superfluous:
+            # 'redirect_uri': f'https://{request.host}/smartonfhir/_redirect',
         }
 
+        # session['token'] holds the endpoint where a token can be obtained.
         response = requests.post(session['token'], data)
         authorization_result = response.json()
 

@@ -1,0 +1,72 @@
+User:
+
+
+Network:
+  id: 1
+  name: student
+  json: '"{\"type\": \"BayesianNetwork\", \"name\": \"Student\", \"nodes\": [{\"type\":
+    \"DiscreteNetworkNode\", \"RV\": \"I\", \"name\": \"I\", \"states\": [\"i0\", \"i1\"],
+    \"description\": \"\", \"cpt\": {\"type\": \"CPT\", \"scope\": [\"I\"], \"variable_states\":
+    {\"I\": [\"i0\", \"i1\"]}, \"data\": [0.7, 0.3], \"description\": \"Intelligence\",
+    \"conditioned\": [\"I\"], \"conditioning\": []}, \"position\": [352, 25]}, {\"type\":
+    \"DiscreteNetworkNode\", \"RV\": \"S\", \"name\": \"S\", \"states\": [\"s0\", \"s1\"],
+    \"description\": \"\", \"cpt\": {\"type\": \"CPT\", \"scope\": [\"I\", \"S\"], \"variable_states\":
+    {\"I\": [\"i0\", \"i1\"], \"S\": [\"s0\", \"s1\"]}, \"data\": [0.95, 0.05, 0.2,
+    0.8], \"description\": \"SAT Score\", \"conditioned\": [\"S\"], \"conditioning\":
+    [\"I\"]}, \"position\": [437, 119]}, {\"type\": \"DiscreteNetworkNode\", \"RV\":
+    \"D\", \"name\": \"D\", \"states\": [\"d0\", \"d1\"], \"description\": \"\", \"cpt\":
+    {\"type\": \"CPT\", \"scope\": [\"D\"], \"variable_states\": {\"D\": [\"d0\", \"d1\"]},
+    \"data\": [0.6, 0.4], \"description\": \"Difficulty\", \"conditioned\": [\"D\"],
+    \"conditioning\": []}, \"position\": [72, 20]}, {\"type\": \"DiscreteNetworkNode\",
+    \"RV\": \"G\", \"name\": \"G\", \"states\": [\"g1\", \"g2\", \"g3\"], \"description\":
+    \"\", \"cpt\": {\"type\": \"CPT\", \"scope\": [\"I\", \"D\", \"G\"], \"variable_states\":
+    {\"I\": [\"i0\", \"i1\"], \"D\": [\"d0\", \"d1\"], \"G\": [\"g1\", \"g2\", \"g3\"]},
+    \"data\": [0.3, 0.4, 0.3, 0.05, 0.25, 0.7, 0.9, 0.08, 0.02, 0.5, 0.3, 0.2], \"description\":
+    \"Grade\", \"conditioned\": [\"G\"], \"conditioning\": [\"I\", \"D\"]}, \"position\":
+    [206, 115]}, {\"type\": \"DiscreteNetworkNode\", \"RV\": \"L\", \"name\": \"L\",
+    \"states\": [\"l0\", \"l1\"], \"description\": \"\", \"cpt\": {\"type\": \"CPT\",
+    \"scope\": [\"G\", \"L\"], \"variable_states\": {\"G\": [\"g1\", \"g2\", \"g3\"],
+    \"L\": [\"l0\", \"l1\"]}, \"data\": [0.1, 0.9, 0.4, 0.6, 0.99, 0.01], \"description\":
+    \"Letter\", \"conditioned\": [\"L\"], \"conditioning\": [\"G\"]}, \"position\":
+    [209, 219]}], \"edges\": [[\"I\", \"S\"], [\"I\", \"G\"], [\"D\", \"G\"], [\"G\",
+    \"L\"]]}"'
+
+  id: 2
+  name: asia
+  json: '{"type": "BayesianNetwork", "name": null, "nodes": [{"type": "DiscreteNetworkNode",
+    "RV": "asia", "name": "asia", "states": ["yes", "no"], "description": "", "cpt":
+    {"type": "CPT", "scope": ["asia"], "variable_states": {"asia": ["yes", "no"]}, "data":
+    [0.01, 0.99], "description": "", "conditioned": ["asia"], "conditioning": []}, "position":
+    [93, 184]}, {"type": "DiscreteNetworkNode", "RV": "tub", "name": "tub", "states":
+    ["yes", "no"], "description": "", "cpt": {"type": "CPT", "scope": ["asia", "tub"],
+    "variable_states": {"asia": ["no", "yes"], "tub": ["no", "yes"]}, "data": [0.99,
+    0.01, 0.95, 0.05], "description": "", "conditioned": ["tub"], "conditioning": ["asia"]},
+    "position": [373, 393]}, {"type": "DiscreteNetworkNode", "RV": "smoke", "name":
+    "smoke", "states": ["yes", "no"], "description": "", "cpt": {"type": "CPT", "scope":
+    ["smoke"], "variable_states": {"smoke": ["yes", "no"]}, "data": [0.5, 0.5], "description":
+    "", "conditioned": ["smoke"], "conditioning": []}, "position": [112, 64]}, {"type":
+    "DiscreteNetworkNode", "RV": "lung", "name": "lung", "states": ["yes", "no"], "description":
+    "", "cpt": {"type": "CPT", "scope": ["smoke", "lung"], "variable_states": {"smoke":
+    ["no", "yes"], "lung": ["no", "yes"]}, "data": [0.99, 0.01, 0.9, 0.1], "description":
+    "", "conditioned": ["lung"], "conditioning": ["smoke"]}, "position": [354, 207]},
+    {"type": "DiscreteNetworkNode", "RV": "bronc", "name": "bronc", "states": ["yes",
+    "no"], "description": "", "cpt": {"type": "CPT", "scope": ["smoke", "bronc"], "variable_states":
+    {"smoke": ["no", "yes"], "bronc": ["no", "yes"]}, "data": [0.7, 0.3, 0.4, 0.6],
+    "description": "", "conditioned": ["bronc"], "conditioning": ["smoke"]}, "position":
+    [448, 42]}, {"type": "DiscreteNetworkNode", "RV": "either", "name": "either", "states":
+    ["yes", "no"], "description": "", "cpt": {"type": "CPT", "scope": ["lung", "tub",
+    "either"], "variable_states": {"lung": ["no", "yes"], "tub": ["no", "yes"], "either":
+    ["no", "yes"]}, "data": [1, 0, 0, 1, 0, 1, 0, 1], "description": "", "conditioned":
+    ["either"], "conditioning": ["lung", "tub"]}, "position": [532, 294]}, {"type":
+    "DiscreteNetworkNode", "RV": "xray", "name": "xray", "states": ["yes", "no"], "description":
+    "", "cpt": {"type": "CPT", "scope": ["either", "xray"], "variable_states": {"either":
+    ["no", "yes"], "xray": ["no", "yes"]}, "data": [0.95, 0.05, 0.02, 0.98], "description":
+    "", "conditioned": ["xray"], "conditioning": ["either"]}, "position": [842, 385]},
+    {"type": "DiscreteNetworkNode", "RV": "dysp", "name": "dysp", "states": ["yes",
+    "no"], "description": "", "cpt": {"type": "CPT", "scope": ["bronc", "either", "dysp"],
+    "variable_states": {"bronc": ["no", "yes"], "either": ["no", "yes"], "dysp": ["no",
+    "yes"]}, "data": [0.9, 0.1, 0.3, 0.7, 0.2, 0.8, 0.1, 0.9], "description": "", "conditioned":
+    ["dysp"], "conditioning": ["bronc", "either"]}, "position": [714, 153]}], "edges":
+    [["asia", "tub"], ["tub", "either"], ["smoke", "lung"], ["smoke", "bronc"], ["lung",
+    "either"], ["bronc", "dysp"], ["either", "xray"], ["either", "dysp"]]}'
+

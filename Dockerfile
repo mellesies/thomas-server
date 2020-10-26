@@ -12,6 +12,8 @@ COPY config.yaml /config.yaml
 
 WORKDIR /usr/local/python/
 
+RUN pip install --upgrade pip
+
 # thomas-core is already installed in the base image.
 RUN pip install -e ./thomas-server
 

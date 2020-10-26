@@ -7,7 +7,7 @@ import logging
 
 from flask_jwt_extended import current_user as user
 from flask_restful import reqparse, inputs
-from flask import request, jsonify, abort
+from flask import request, jsonify, abort, Response
 from marshmallow import fields
 from marshmallow_sqlalchemy import ModelSchema, field_for
 from http import HTTPStatus
@@ -105,6 +105,27 @@ class Network(BaseResource):
 
         log.info(f"403: not allowed!")
         abort(403)
+
+
+    @with_user
+    def _delete(self, id):
+        """Delete a resource."""
+        result = getattr(db, self.clsname()).get(id)
+
+        if result:
+            try:
+                result.delete()
+                log.warn(f"DELETED Network '{id}'")
+                return {"message": "OK"}, HTTPStatus.ACCEPTED
+
+            except Exception as e:
+                log.error(f"Could not delete Network '{id}'")
+                log.exception(e)
+                return {"message": "Internal server error"}, HTTPStatus.INTERNAL_SERVER_ERROR
+
+        log.error(f"Could not find Network '{id}'?")
+        return {"message": "Resource not found"}, HTTPStatus.NOT_FOUND
+
 
     def _search(self, *args, **kwargs):
         """Overrides BaseResource._search()"""

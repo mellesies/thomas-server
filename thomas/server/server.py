@@ -77,11 +77,16 @@ class JSONEncoder(json.JSONEncoder):
 
 @api.representation('application/json')
 def output_json(data, code, headers=None):
-
     if isinstance(data, db.Base):
+        log.debug(f"Serializing {data.clsname()} to JSON")
         data = db.jsonable(data)
+
     elif isinstance(data, list) and len(data) and isinstance(data[0], db.Base):
+        log.debug(f"Serializing [{data[0].clsname()}, ...] to JSON")
         data = db.jsonable(data)
+
+    else:
+        log.warn(f"Not sure how to serialize '{type(data)}'?")
 
     json_data = json.dumps(data, indent=4, sort_keys=False, cls=JSONEncoder)
     resp = make_response(json_data, code)
@@ -150,7 +155,8 @@ app.config.update(
     SECRET_KEY=str(uuid.uuid1()).encode('utf8'),
     # SECRET_KEY='developing'.encode('utf8'),
     SESSION_COOKIE_DOMAIN='zakbroek.com',
-    SESSION_COOKIE_SAMESITE=None,
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE='None',
 )
 
 def init(config_file, environment, system, drop_database=False):
