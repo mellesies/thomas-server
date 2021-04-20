@@ -7,8 +7,6 @@ import logging
 
 from flask import request, redirect, session, abort
 from flask_restful import Resource
-from flask_jwt_extended import jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
-from http import HTTPStatus
 
 import requests
 from urllib.parse import urlencode
@@ -16,9 +14,6 @@ from uuid import uuid1
 
 import fhir
 
-from . import BaseResource, only_for, with_user
-from .. import server
-from .. import db
 from .. import util
 
 module_name = __name__.split('.')[-1]
@@ -37,9 +32,8 @@ def setup(api, API_BASE):
     )
 
 
-
 def gen_dict_with_key_value(key, value, var):
-    if hasattr(var,'items'):
+    if hasattr(var, 'items'):
         for k, v in var.items():
             if (k == key) and (v == value):
                 yield var
@@ -64,7 +58,6 @@ class FHIR(Resource):
             return v.coding[0].code.toNative()
 
         return v.toNative()
-
 
     def __get_observations(self):
         """Return observations (key/value) for current patient."""
@@ -207,7 +200,6 @@ class FHIR(Resource):
 
         return redirect(redirect_url)
 
-
     def get(self, id_or_operation=None):
         """FHIR EHR launch endpoint"""
         # util.log_full_request(request)
@@ -222,5 +214,3 @@ class FHIR(Resource):
                 return func()
 
         return "nah .. "
-
-
