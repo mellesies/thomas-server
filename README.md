@@ -32,6 +32,10 @@ start a server, listening on `localhost`, port `5000`:
 Start the server as follows:
 
 ```bash
+# Load the fixtures (incl. default user root/toor)
+thomas load-fixtures --environment=dev
+
+# Start the server (see --help for details)
 thomas start
 ```
 

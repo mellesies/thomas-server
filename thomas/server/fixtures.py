@@ -49,7 +49,7 @@ def create_users():
     }
 
     root_roles = [roles['root'], roles['admin']]
-    admin_roles = [roles['admin']]
+    # admin_roles = [roles['admin']]
 
     try_to_create(
         db.User,
@@ -66,27 +66,32 @@ def create_networks():
 
     root = db.User.getByUsername('root')
 
-    try_to_create(db.Network, 'lungcancer',
+    try_to_create(
+        db.Network,
+        'lungcancer',
         id='lungcancer',
         name='Lungcancer',
         json=examples.get_lungcancer_network().as_dict(),
         owner=root,
     )
 
-    try_to_create(db.Network, 'student',
+    try_to_create(
+        db.Network,
+        'student',
         id='student',
         name='Student',
         json=examples.get_student_network().as_dict(),
         owner=root,
     )
 
-    try_to_create(db.Network, 'sprinkler',
+    try_to_create(
+        db.Network,
+        'sprinkler',
         id='sprinkler',
         name='Sprinkler',
         json=examples.get_sprinkler_network().as_dict(),
         owner=root,
     )
-
 
 
 # ------------------------------------------------------------------------------

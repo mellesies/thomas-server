@@ -6,14 +6,14 @@ from setuptools import setup, find_namespace_packages
 # To use a consistent encoding
 from codecs import open
 import os
-from os import path
+import os.path
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 PKG_NAME = "thomas-server"
 PKG_DESC = "Thomas' RESTful API and webinterface."
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     PKG_DESCRIPTION = f.read()
 
 # Read the API version from disk. This file should be located in the package
@@ -22,8 +22,10 @@ version_path = os.path.join(here, 'thomas', 'server', '_version.py')
 version_ns = {
     '__file__': version_path
 }
+
 with open(version_path) as f:
     exec(f.read(), {}, version_ns)
+
 
 def package_files(directory, base=''):
     paths = []
@@ -67,7 +69,7 @@ setup(
         'flask-restful',
         'flask-socketio>=4.2',
         'flask>=1.1',
-        'flask_jwt_extended',
+        'flask_jwt_extended==3.24',
         'flask_marshmallow>=0.12',
         'flask_sqlalchemy',
         'marshmallow',
@@ -77,7 +79,6 @@ setup(
         'sqlalchemy>=1.3',
         'termcolor',
         'thomas-core',
-        # 'fhir @ https://github.com/mellesies/py-fhir/tarball/master#egg=fhir',
         'py-fhir',
         'werkzeug>=1.0',
     ],

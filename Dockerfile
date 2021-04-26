@@ -3,27 +3,37 @@ FROM mellesies/thomas-core:latest
 
 LABEL maintainer="Melle Sieswerda <m.sieswerda@iknl.nl>"
 
-USER root
-
+# -- Defined in thomas-core:latest --
+# ARG NB_USER=jupyter
+# ARG NB_UID=1000
+# ENV USER ${NB_USER}
+# ENV NB_UID ${NB_UID}
+# ENV HOME /home/${NB_USER}
+# ENV THOMAS_DIR /home/${NB_USER}/thomas
 
 # Copy package
-COPY . /usr/local/python/thomas-server/
-COPY config.yaml /config.yaml
+USER root
+# COPY . ${THOMAS_DIR}/thomas-server/
+COPY thomas ${THOMAS_DIR}/thomas-server/thomas
+COPY LICENSE ${THOMAS_DIR}/thomas-server/
+COPY README.md ${THOMAS_DIR}/thomas-server/
+COPY setup.py ${THOMAS_DIR}/thomas-server/
 
-WORKDIR /usr/local/python/
+COPY config.yaml ${HOME}/config.yaml
 
-RUN pip install --upgrade pip
+RUN mkdir -p ${HOME}/.local/bin
+RUN chown -R ${USER}:${USER} ${HOME}
+
+WORKDIR ${THOMAS_DIR}
+USER ${USER}
+ENV PATH="${PATH}:${HOME}/.local/bin"
+
 
 # thomas-core is already installed in the base image.
 RUN pip install -e ./thomas-server
 
 # Load fixtures here (users & networks) & run thomas!
-# WORKDIR /usr/local/python/thomas-server/
-WORKDIR /
-
-# Shortcuts for convenience
-# RUN ln -s /usr/local/lib/python3.8/site-packages ./
-# RUN ln -s /root/.local/share/thomas ./
+WORKDIR ${HOME}
 
 RUN thomas load-fixtures --environment=dev
 RUN thomas load-fixtures --environment=prod
